@@ -19,6 +19,4 @@ def print_summary(data: dict) -> None:
 
 
 if __name__ == "__main__":
-    info = fetch_user("torvalds")
-    if info is not None:
-        print_summary(info)
+    print_summary(fetch_user("torvalds"))
