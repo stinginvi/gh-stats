@@ -33,9 +33,8 @@ def print_user(data: dict) -> None:
     print(f"  注册时间: {data['created_at'][:10]}")
 
 
-def print_repos(repos: list[dict], top: int) -> None:
-    """按 stars 降序打印前 top 个仓库。"""
-    ranked = sorted(repos, key=lambda repo: repo["stars"], reverse=True)[:top]
+def print_repos(ranked: list[dict]) -> None:
+    """打印已经排序好的仓库列表。"""
     if not ranked:
         print("没有找到仓库")
         return
@@ -112,10 +111,12 @@ def cmd_repos(args) -> int:
         repos = list(api.get_repos(args.username))
     except (requests.RequestException, RuntimeError) as exc:
         return _report_error(exc, args.username)
+    # 排序和取前 N 只做一次，表格和 JSON 看到的是同一批数据
+    ranked = sorted(repos, key=lambda repo: repo["stars"], reverse=True)[: args.top]
     if args.json:
-        print(json.dumps(repos, ensure_ascii=False, indent=2))
+        print(json.dumps(ranked, ensure_ascii=False, indent=2))
     else:
-        print_repos(repos, args.top)
+        print_repos(ranked)
     return 0
 
 
